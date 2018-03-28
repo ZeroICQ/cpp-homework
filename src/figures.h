@@ -1,7 +1,7 @@
 #pragma once
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 class Figure {
 public:

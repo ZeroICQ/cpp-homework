@@ -2,7 +2,6 @@
 #include "figures.h"
 
 int main() {
-    Circle kek(0, 0, 1);
-    std::cout << kek.length() << std::endl;
+    std::cout << "main.cpp" << std::endl;
     return 0;
 }
