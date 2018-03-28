@@ -13,11 +13,11 @@ TEST_CASE("Test Point", "[figure][point]") {
     }
 
     SECTION("Get x") {
-        REQUIRE(testPoint.getX() == x);
+        REQUIRE(testPoint.x() == x);
     }
 
     SECTION("Get y") {
-        REQUIRE(testPoint.getY() == y);
+        REQUIRE(testPoint.y() == y);
     }
 }
 
@@ -40,12 +40,33 @@ TEST_CASE("Test Circle", "[figure][segment]") {
         REQUIRE(testCircle.length() == 12.566370614359172);
     }
 }
+//
+//TEST_CASE("Test Polyline", "[figure][segment]") {
+//    std::vector<std::pair<double, double>> points{{0, 0}, {0, 5}, {10, 5}};
+//    Polyline testPolyline(points);
+//
+//    SECTION("Get length") {
+//        REQUIRE(testPolyline.length() == 15);
+//    }
+//}
 
-TEST_CASE("Test Polyline", "[figure][segment]") {
-    std::vector<std::pair<double, double>> points{{0, 0}, {0, 5}, {10, 5}};
-    Polyline testPolyline(points);
+TEST_CASE("Intersect Segments") {
+    Segment testSegment(10, 10, 100, 10);
+    //ASK: ok use a lot of auto. Pros, cons
+    SECTION("Intersect with perpendicular segment") {
+        Segment otherSegment(20, 100, 20, 0);
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
 
-    SECTION("Get length") {
-        REQUIRE(testPolyline.length() == 152);
+        REQUIRE((intrsct[0].x() == intrsctR[0].x() && intrsctR[0].x() == 20));
+        REQUIRE((intrsct[0].y() == intrsctR[0].y() && intrsctR[0].y() == 10));
+    }
+
+    SECTION("Intersect with nonperpendicular segment") {
+        Segment testSegment(0, 5, 5, 0);
+        Segment otherSegment(0, 3, 8, 3);
+        auto intersection = testSegment.intersect(otherSegment);
+        REQUIRE(intersection[0].x() == 2);
+        REQUIRE(intersection[0].y() == 3);
     }
 }
