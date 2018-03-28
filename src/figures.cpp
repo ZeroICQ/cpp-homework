@@ -2,6 +2,11 @@
 #include <vector>
 #include "figures.h"
 
+//Figrue
+std::vector<Point> Figure::intersect(const Figure &other) const {
+    return other.intersect(other);
+}
+
 //Point
 double Point::distance(const Point &other) const {
     return sqrt(
@@ -96,10 +101,10 @@ std::vector<Point> Segment::intersect(const Circle &other) const {
 
 std::vector<Point> Segment::intersect(const Polyline &other) const {
     std::vector<Point> result;
-    std::vector<Point> points = other.points();
+    std::vector<Segment> segments(other.segments());
 
-    for (ulong i = 1; i < points.size(); i++) {
-        std::vector<Point> segmentIntrscts = intersect(Segment(points[i-1], points[i]));
+    for (const auto &segment : segments) {
+        std::vector<Point> segmentIntrscts = intersect(segment);
         result.insert(result.end(), segmentIntrscts.begin(), segmentIntrscts.end());
     }
 
@@ -149,6 +154,19 @@ std::vector<Point> Circle::intersect(const Circle &other) const {
     return result;
 }
 
+std::vector<Point> Circle::intersect(const Polyline &other) const {
+    //ASK: will copy on several returns?
+    std::vector<Point> result;
+    std::vector<Segment> segments(other.segments());
+
+    for (const auto &segment : segments) {
+        std::vector<Point> segmentIntrscts = intersect(segment);
+        result.insert(result.end(), segmentIntrscts.begin(), segmentIntrscts.end());
+    }
+
+    return result;
+}
+
 //Polyline
 double Polyline::length() const {
     double totalLength = 0;
@@ -157,4 +175,30 @@ double Polyline::length() const {
         totalLength += points_[i - 1].distance(points_[i]);
     }
     return totalLength;
+}
+
+std::vector<Segment> Polyline::segments() const {
+    std::vector<Point> tmpPoints(points());
+
+    std::vector<Segment> result;
+
+    result.reserve(points().size());
+
+    for (ulong i = 1; i < tmpPoints.size(); i++) {
+        result.emplace_back(tmpPoints[i-1], tmpPoints[i]);
+    }
+
+    return std::vector<Segment>();
+}
+
+std::vector<Point> Polyline::intersect(const Segment &other) const {
+    return other.intersect(*this);
+}
+
+std::vector<Point> Polyline::intersect(const Circle &other) const {
+    return other.intersect(*this);
+}
+
+std::vector<Point> Polyline::intersect(const Polyline &other) const {
+    return other.intersect(*this);
 }

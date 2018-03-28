@@ -70,3 +70,4 @@ TEST_CASE("Intersect Segments") {
         REQUIRE(intersection[0].y() == 3);
     }
 }
+
