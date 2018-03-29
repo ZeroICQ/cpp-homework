@@ -3,9 +3,9 @@
 #include "figures.h"
 
 //Figrue
-std::vector<Point> Figure::intersect(const Figure &other) const {
-    return other.intersect(other);
-}
+//std::vector<Point> Figure::intersect(const Figure &other) const {
+//
+//}
 
 //Point
 double Point::distance(const Point &other) const {
@@ -111,6 +111,10 @@ std::vector<Point> Segment::intersect(const Polyline &other) const {
     return result;
 }
 
+std::vector<Point> Segment::intersect(const Figure &other) const {
+    return other.intersect(*this);
+}
+
 
 //Circle
 double Circle::length() const {
@@ -167,6 +171,10 @@ std::vector<Point> Circle::intersect(const Polyline &other) const {
     return result;
 }
 
+std::vector<Point> Circle::intersect(const Figure &other) const {
+    return other.intersect(*this);
+}
+
 //Polyline
 double Polyline::length() const {
     double totalLength = 0;
@@ -200,5 +208,9 @@ std::vector<Point> Polyline::intersect(const Circle &other) const {
 }
 
 std::vector<Point> Polyline::intersect(const Polyline &other) const {
+    return other.intersect(*this);
+}
+
+std::vector<Point> Polyline::intersect(const Figure &other) const {
     return other.intersect(*this);
 }

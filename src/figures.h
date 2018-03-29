@@ -13,7 +13,7 @@ class Figure {
 public:
     virtual double length() const = 0;
 
-    virtual std::vector<Point> intersect(const Figure &other) const;
+    virtual std::vector<Point> intersect(const Figure &other) const = 0;
     virtual std::vector<Point> intersect(const Segment &other) const = 0;
     virtual std::vector<Point> intersect(const Circle &other) const = 0;
     virtual std::vector<Point> intersect(const Polyline &other) const = 0;
@@ -49,6 +49,7 @@ public:
 
     double length() const override;
 
+    std::vector<Point> intersect(const Figure &other) const override;
     std::vector<Point> intersect(const Segment &other) const override;
     std::vector<Point> intersect(const Circle &other) const override;
     std::vector<Point> intersect(const Polyline &other) const override;
@@ -68,6 +69,7 @@ public:
         : center_(x, y),
           radius_(radius > 0 ? radius : 0) {};
 
+    std::vector<Point> intersect(const Figure &other) const override;
     std::vector<Point> intersect(const Segment &other) const override;
     std::vector<Point> intersect(const Circle &other) const override;
     std::vector<Point> intersect(const Polyline &other) const override;
@@ -89,6 +91,7 @@ public:
     //ASK: std::move()??
     explicit Polyline(std::vector<Point> points) : points_(std::move(points)) {};
 
+    std::vector<Point> intersect(const Figure &other) const override;
     std::vector<Point> intersect(const Segment &other) const override;
     std::vector<Point> intersect(const Circle &other) const override;
     std::vector<Point> intersect(const Polyline &other) const override;

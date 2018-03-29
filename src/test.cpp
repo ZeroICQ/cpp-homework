@@ -40,15 +40,20 @@ TEST_CASE("Test Circle", "[figure][segment]") {
         REQUIRE(testCircle.length() == 12.566370614359172);
     }
 }
-//
-//TEST_CASE("Test Polyline", "[figure][segment]") {
-//    std::vector<std::pair<double, double>> points{{0, 0}, {0, 5}, {10, 5}};
-//    Polyline testPolyline(points);
-//
-//    SECTION("Get length") {
-//        REQUIRE(testPolyline.length() == 15);
-//    }
-//}
+
+TEST_CASE("Test Polyline", "[figure][segment]") {
+    std::vector<Point> points;
+
+    points.emplace_back(0, 0);
+    points.emplace_back(0, 5);
+    points.emplace_back(10, 5);
+
+    Polyline testPolyline(points);
+
+    SECTION("Get length") {
+        REQUIRE(testPolyline.length() == 15);
+    }
+}
 
 TEST_CASE("Intersect Segments") {
     Segment testSegment(10, 10, 100, 10);
@@ -69,5 +74,66 @@ TEST_CASE("Intersect Segments") {
         REQUIRE(intersection[0].x() == 2);
         REQUIRE(intersection[0].y() == 3);
     }
+
+    SECTION("Segment no intersecton") {
+        Segment testSegment(0, 5, 5, 0);
+        Segment otherSegment(100, 22, 100, 33);
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+        REQUIRE(intrsct.size() == 0);
+        REQUIRE(intrsctR.size() == 0);
+    }
+
+    SECTION("Segment one point") {
+        Segment testSegment(0, 0, 4, 4);
+        Segment otherSegment(0, 0, 0, 2);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE((intrsct[0].x() == intrsctR[0].x()  && intrsctR[0].x() == 0));
+        REQUIRE((intrsct[0].y() == intrsctR[0].y()  && intrsctR[0].y() == 0));
+    }
+
+    SECTION("Segment one point") {
+        Segment testSegment(0, 0, 4, 4);
+        Segment otherSegment(0, 0, 4, 4);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Very close not intersecting lines") {
+        Segment testSegment(0, 0, 4, 4);
+        Segment otherSegment(2, 0, 4, 1.99999);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
 }
 
+TEST_CASE("Intersect polyline and segment", "[figure][segment][polyline]") {
+    SECTION("Very close not intersecting lines") {
+        std::vector<Point> polyPoints;
+
+        polyPoints.emplace_back(6, 4);
+        polyPoints.emplace_back(0, 1);
+        polyPoints.emplace_back(5, 1);
+
+        Polyline testPolyline(polyPoints);
+
+        Segment otherSegment(2, 0, 4, 1.99999);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+}
