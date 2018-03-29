@@ -11,6 +11,7 @@ class Polyline;
 
 class Figure {
 public:
+    virtual ~Figure() {}
     virtual double length() const = 0;
 
     virtual std::vector<Point> intersect(const Figure &other) const = 0;
@@ -19,18 +20,19 @@ public:
     virtual std::vector<Point> intersect(const Polyline &other) const = 0;
 
 protected:
-    //ASK: constexpr???
     static constexpr double EPS = 0.00001;
 };
 
 
 class Point {
 public:
-    Point(double x , double y) :x_(x), y_(y) {};
-    //ASK: const Point has no effect in declaration
+    Point(double x , double y) :x_(x), y_(y) {}
+
+    bool operator==(const Point& rhs) const;
+
     double distance(const Point &other) const;
     double length() const;
-    //ask need vertical space?
+
     double x() const { return x_; }
     double y() const { return y_; }
 
@@ -45,7 +47,7 @@ public:
     Segment(double x1, double y1, double x2, double y2)
          : start_(x1, y1), end_(x2, y2) {};
 
-    Segment(Point start, Point end) : start_(start), end_(end) {};
+    Segment(Point start, Point end) : start_(start), end_(end) {}
 
     double length() const override;
 
@@ -54,7 +56,6 @@ public:
     std::vector<Point> intersect(const Circle &other) const override;
     std::vector<Point> intersect(const Polyline &other) const override;
 
-    //ASK: Point getStart() { return start_; };<-------------????(semicolon)
     Point start() const { return start_; }
     Point end() const { return end_; }
 private:
@@ -67,7 +68,7 @@ class Circle : public Figure
 public:
     Circle(double x, double y, double radius)
         : center_(x, y),
-          radius_(radius > 0 ? radius : 0) {};
+          radius_(radius > 0 ? radius : 0) {}
 
     std::vector<Point> intersect(const Figure &other) const override;
     std::vector<Point> intersect(const Segment &other) const override;
@@ -84,12 +85,10 @@ private:
     double radius_;
 };
 
-////TODO: read about std:move and rvalue, lvalue
 class Polyline : public Figure
 {
 public:
-    //ASK: std::move()??
-    explicit Polyline(std::vector<Point> points) : points_(std::move(points)) {};
+    explicit Polyline(const std::vector<Point> &points) : points_(points) {};
 
     std::vector<Point> intersect(const Figure &other) const override;
     std::vector<Point> intersect(const Segment &other) const override;

@@ -57,7 +57,6 @@ TEST_CASE("Test Polyline", "[figure][segment]") {
 
 TEST_CASE("Intersect Segments") {
     Segment testSegment(10, 10, 100, 10);
-    //ASK: ok use a lot of auto. Pros, cons
     SECTION("Intersect with perpendicular segment") {
         Segment otherSegment(20, 100, 20, 0);
         auto intrsct = testSegment.intersect(otherSegment);
@@ -95,7 +94,7 @@ TEST_CASE("Intersect Segments") {
         REQUIRE((intrsct[0].y() == intrsctR[0].y()  && intrsctR[0].y() == 0));
     }
 
-    SECTION("Segment one point") {
+    SECTION("Segment same ") {
         Segment testSegment(0, 0, 4, 4);
         Segment otherSegment(0, 0, 4, 4);
 
@@ -104,6 +103,17 @@ TEST_CASE("Intersect Segments") {
 
         REQUIRE(intrsct.empty());
         REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Segment same line, no intersect") {
+        Segment testSegment(0, 0, 5, 5);
+        Segment otherSegment(6, 6, 10, 10);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE(intrsct.size() == 0);
+        REQUIRE(intrsctR.size() == 0);
     }
 
     SECTION("Very close not intersecting lines") {
@@ -122,18 +132,25 @@ TEST_CASE("Intersect polyline and segment", "[figure][segment][polyline]") {
     SECTION("Very close not intersecting lines") {
         std::vector<Point> polyPoints;
 
+        //ASK: init vetctor
+        //ASK: vert spaces
         polyPoints.emplace_back(6, 4);
         polyPoints.emplace_back(0, 1);
         polyPoints.emplace_back(5, 1);
 
         Polyline testPolyline(polyPoints);
+        Segment testSegment(4, 5, 4, -1);
 
-        Segment otherSegment(2, 0, 4, 1.99999);
+        auto intrsct = testPolyline.intersect(testSegment);
+        auto intrsctR = testSegment.intersect(testPolyline);
 
-        auto intrsct = testSegment.intersect(otherSegment);
-        auto intrsctR = otherSegment.intersect(testSegment);
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 3)) != intrsct.end());
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 1)) != intrsct.end());
 
-        REQUIRE(intrsct.empty());
-        REQUIRE(intrsctR.empty());
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 3)) != intrsctR.end());
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 1)) != intrsctR.end());
+
+        REQUIRE(intrsct.size() == 2);
+        REQUIRE(intrsctR.size() == 2);
     }
 }

@@ -2,11 +2,6 @@
 #include <vector>
 #include "figures.h"
 
-//Figrue
-//std::vector<Point> Figure::intersect(const Figure &other) const {
-//
-//}
-
 //Point
 double Point::distance(const Point &other) const {
     return sqrt(
@@ -19,32 +14,24 @@ double Point::length() const {
     return 0;
 }
 
+bool Point::operator==(const Point &rhs) const {
+    return this->x() == rhs.x() && this->y() == rhs.y();
+}
+
 //Segment
 double Segment::length() const {
     return start_.distance(end_);
 }
 
-//ASK: why google doesn't allow non-const references?
 std::vector<Point> Segment::intersect(const Segment &other) const {
     //http://algolist.ru/maths/geom/intersect/lineline2d.php
-
-    //ASK: is it a good idea to access private vars via getters in methods
-    //ASK: is good mix
-    //i.e. getStart().getX()
-
-    //ASK: semicolon = no new line??
-    //ASK: define in one place??
-    //ASK: return anonymous array
-    //ASK: getters and pri
-    //ASK: start(), start(value);
-
     double x1, y1, x2, y2, x3, y3, x4, y4, d;
     std::vector<Point> result;
 
-    x1 = start().x();       y1 = start().y();
-    x2 = end().x();         y2 = end().y();
+    x1 = start().x();             y1 = start().y();
+    x2 = end().x();                  y2 = end().y();
     x3 = other.start().x(); y3 = other.start().y();
-    x4 = other.end().x();   y4 = other.end().y();
+    x4 = other.end().x();      y4 = other.end().y();
 
     d = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
 
@@ -52,8 +39,6 @@ std::vector<Point> Segment::intersect(const Segment &other) const {
     double uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / d;
 
     if (0 <= uA  && uA <= 1 && 0 <= uB && uB <= 1) {
-        //ASK: Point point; ???
-        Point answer();
         double intersectX = x1 + uA * (x2 - x1);
         double intersectY = y1 + uA * (y2 - y1);
         result.emplace_back(intersectX, intersectY);
@@ -84,7 +69,7 @@ std::vector<Point> Segment::intersect(const Circle &other) const {
                             y0 + other.center().y());
 
     } else if (C * C < r * r * (A * A + B * B) + EPS) {
-        double d = r * r - C * C/(A * A + B * B);
+        double d = r * r - C * C / (A * A + B * B);
         double mult = sqrt(d / (A * A + B * B));
 
         double ax = x0 + B * mult + other.center().x();
@@ -115,7 +100,6 @@ std::vector<Point> Segment::intersect(const Figure &other) const {
     return other.intersect(*this);
 }
 
-
 //Circle
 double Circle::length() const {
     return 2 * M_PI * radius_;
@@ -128,7 +112,6 @@ std::vector<Point> Circle::intersect(const Segment &other) const {
 std::vector<Point> Circle::intersect(const Circle &other) const {
     std::vector<Point> result;
     //http://www.litunovskiy.com/gamedev/intersection_of_two_circles/
-
     double distance = center().distance(other.center());
 
     bool nesting = fabs(other.radius() - radius()) > distance;
@@ -159,7 +142,6 @@ std::vector<Point> Circle::intersect(const Circle &other) const {
 }
 
 std::vector<Point> Circle::intersect(const Polyline &other) const {
-    //ASK: will copy on several returns?
     std::vector<Point> result;
     std::vector<Segment> segments(other.segments());
 
@@ -178,8 +160,7 @@ std::vector<Point> Circle::intersect(const Figure &other) const {
 //Polyline
 double Polyline::length() const {
     double totalLength = 0;
-    //ASK: ulong, really?
-    for (ulong i = 1; i < points_.size(); i++) {
+    for (int i = 1; i < (int) points_.size(); i++) {
         totalLength += points_[i - 1].distance(points_[i]);
     }
     return totalLength;
