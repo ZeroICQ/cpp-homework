@@ -1,43 +1,36 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include <vector>
 #include "catch.hpp"
 #include "figures.h"
-#include <vector>
 
 TEST_CASE("Test Point", "[figure][point]") {
-    double x = 10, y = 10;
-
-    Point testPoint(x, y);
+    Point testPoint(10, 10);
 
     SECTION("Get length") {
-        REQUIRE(testPoint.length() == 0);
+        REQUIRE(testPoint.length() == Approx(0));
     }
 
     SECTION("Get x") {
-        REQUIRE(testPoint.x() == x);
+        REQUIRE(testPoint.x() == 10);
     }
 
     SECTION("Get y") {
-        REQUIRE(testPoint.y() == y);
+        REQUIRE(testPoint.y() == 10);
     }
 }
 
 TEST_CASE("Test Segment", "[figure][segment]") {
-    double x1 = 10,  y1 = 10;
-    double x2 = 100, y2 = 10;
-
-    Segment testSegment(x1, y1, x2, y2);
+    Segment testSegment(10, 10, 100, 10);
 
     SECTION("Get length") {
-        REQUIRE(testSegment.length() == 90);
+        REQUIRE(testSegment.length() == Approx(90));
     }
 }
 
 TEST_CASE("Test Circle", "[figure][segment]") {
-    double x = 10, y = 10, radius = 2;
-    Circle testCircle(x, y, radius);
+    Circle testCircle(10, 10, 2);
 
     SECTION("Get length") {
-        REQUIRE(testCircle.length() == 12.566370614359172);
+        REQUIRE(testCircle.length() == Approx(12.566370614359172));
     }
 }
 
@@ -51,50 +44,66 @@ TEST_CASE("Test Polyline", "[figure][segment]") {
     Polyline testPolyline(points);
 
     SECTION("Get length") {
-        REQUIRE(testPolyline.length() == 15);
+        REQUIRE(testPolyline.length() == Approx(15));
     }
 }
 
 TEST_CASE("Intersect Segments") {
-    Segment testSegment(10, 10, 100, 10);
     SECTION("Intersect with perpendicular segment") {
+        Segment testSegment(10, 10, 100, 10);
         Segment otherSegment(20, 100, 20, 0);
+
         auto intrsct = testSegment.intersect(otherSegment);
         auto intrsctR = otherSegment.intersect(testSegment);
 
-        REQUIRE((intrsct[0].x() == intrsctR[0].x() && intrsctR[0].x() == 20));
-        REQUIRE((intrsct[0].y() == intrsctR[0].y() && intrsctR[0].y() == 10));
+        REQUIRE(intrsct.size() == 1);
+        REQUIRE(intrsct[0].x() == Approx(20));
+        REQUIRE(intrsct[0].y() == Approx(10));
+
+        REQUIRE(intrsctR.size() == 1);
+        REQUIRE(intrsctR[0].x() == Approx(20));
+        REQUIRE(intrsctR[0].y() == Approx(10));
     }
 
-    SECTION("Intersect with nonperpendicular segment") {
+    SECTION("Intersecting segment") {
         Segment testSegment(0, 5, 5, 0);
         Segment otherSegment(0, 3, 8, 3);
-        auto intersection = testSegment.intersect(otherSegment);
-        REQUIRE(intersection[0].x() == 2);
-        REQUIRE(intersection[0].y() == 3);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+
+        REQUIRE(intrsct.size() == 1);
+        REQUIRE(intrsct[0].x() == Approx(2));
+        REQUIRE(intrsct[0].y() == Approx(3));
     }
 
-    SECTION("Segment no intersecton") {
+    SECTION("Not intersecting segments") {
         Segment testSegment(0, 5, 5, 0);
         Segment otherSegment(100, 22, 100, 33);
+
         auto intrsct = testSegment.intersect(otherSegment);
         auto intrsctR = otherSegment.intersect(testSegment);
-        REQUIRE(intrsct.size() == 0);
-        REQUIRE(intrsctR.size() == 0);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
     }
 
-    SECTION("Segment one point") {
+    SECTION("Segments with common start point") {
         Segment testSegment(0, 0, 4, 4);
         Segment otherSegment(0, 0, 0, 2);
 
         auto intrsct = testSegment.intersect(otherSegment);
         auto intrsctR = otherSegment.intersect(testSegment);
 
-        REQUIRE((intrsct[0].x() == intrsctR[0].x()  && intrsctR[0].x() == 0));
-        REQUIRE((intrsct[0].y() == intrsctR[0].y()  && intrsctR[0].y() == 0));
+        REQUIRE(intrsct.size() == 1);
+        REQUIRE(intrsct[0].x() == Approx(0));
+        REQUIRE(intrsct[0].y() == Approx(0));
+
+        REQUIRE(intrsctR.size() == 1);
+        REQUIRE(intrsctR[0].x() == Approx(0));
+        REQUIRE(intrsctR[0].y() == Approx(0));
     }
 
-    SECTION("Segment same ") {
+    SECTION("Equal segments") {
         Segment testSegment(0, 0, 4, 4);
         Segment otherSegment(0, 0, 4, 4);
 
@@ -112,13 +121,46 @@ TEST_CASE("Intersect Segments") {
         auto intrsct = testSegment.intersect(otherSegment);
         auto intrsctR = otherSegment.intersect(testSegment);
 
-        REQUIRE(intrsct.size() == 0);
-        REQUIRE(intrsctR.size() == 0);
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Segment same line, one common point") {
+        Segment testSegment(0, 0, 5, 5);
+        Segment otherSegment(5, 5, 10, 10);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Segment same line, intersecting") {
+        Segment testSegment(0, 0, 5, 5);
+        Segment otherSegment(3, 3, 10, 10);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
     }
 
     SECTION("Very close not intersecting lines") {
         Segment testSegment(0, 0, 4, 4);
-        Segment otherSegment(2, 0, 4, 1.99999);
+        Segment otherSegment(2, 0, 4, 3.7);
+
+        auto intrsct = testSegment.intersect(otherSegment);
+        auto intrsctR = otherSegment.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Very close not intersecting lines 2") {
+        Segment testSegment(0, 0, 4, 4);
+        Segment otherSegment(3.8, 4.7, 4.5, 3.4);
 
         auto intrsct = testSegment.intersect(otherSegment);
         auto intrsctR = otherSegment.intersect(testSegment);
@@ -128,29 +170,171 @@ TEST_CASE("Intersect Segments") {
     }
 }
 
-TEST_CASE("Intersect polyline and segment", "[figure][segment][polyline]") {
-    SECTION("Very close not intersecting lines") {
-        std::vector<Point> polyPoints;
+TEST_CASE("Intersect circle and segment", "[figure][segment][circle]") {
+    SECTION("Doesn't intersect") {
+        Segment testSegment(10, 4.2, 0, 2.2);
+        Circle testCircle(0, 0, 2);
 
-        //ASK: init vetctor
-        //ASK: vert spaces
-        polyPoints.emplace_back(6, 4);
-        polyPoints.emplace_back(0, 1);
-        polyPoints.emplace_back(5, 1);
+        auto intrsct = testSegment.intersect(testCircle);
+        auto intrsctR = testCircle.intersect(testSegment);
 
-        Polyline testPolyline(polyPoints);
-        Segment testSegment(4, 5, 4, -1);
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
 
-        auto intrsct = testPolyline.intersect(testSegment);
-        auto intrsctR = testSegment.intersect(testPolyline);
+    SECTION("Close. but doesn't intersect") {
+        Segment testSegment(3.49334, 0.90655, 0, 2.2);
+        Circle testCircle(0, 0, 2);
 
-        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 3)) != intrsct.end());
-        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 1)) != intrsct.end());
+        auto intrsct = testSegment.intersect(testCircle);
+        auto intrsctR = testCircle.intersect(testSegment);
 
-        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 3)) != intrsctR.end());
-        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 1)) != intrsctR.end());
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Tangent") {
+        Segment testSegment(3, 2, -1.8, 2);
+        Circle testCircle(0, 0, 2);
+
+
+        auto intrsct = testSegment.intersect(testCircle);
+        auto intrsctR = testCircle.intersect(testSegment);
+
+        REQUIRE(intrsct.size() == 1);
+        REQUIRE(intrsct[0].x() == Approx(0));
+        REQUIRE(intrsct[0].y() == Approx(2));
+
+        REQUIRE(intrsctR.size() == 1);
+        REQUIRE(intrsctR[0].x() == Approx(0));
+        REQUIRE(intrsctR[0].y() == Approx(2));
+    }
+
+    SECTION("Segment inside circle") {
+        Segment testSegment(-1, 1, 1, -1);
+        Circle testCircle(0, 0, 2);
+
+
+        auto intrsct = testSegment.intersect(testCircle);
+        auto intrsctR = testCircle.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Intersect") {
+        Segment testSegment(-5, 0, 10, 0);
+        Circle testCircle(0, 0, 2);
+
+        auto intrsct = testSegment.intersect(testCircle);
+        auto intrsctR = testCircle.intersect(testSegment);
 
         REQUIRE(intrsct.size() == 2);
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(-2, 0)) != intrsct.end());
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(2, 0)) != intrsct.end());
+
         REQUIRE(intrsctR.size() == 2);
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(-2, 0)) != intrsctR.end());
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(2, 0)) != intrsctR.end());
     }
+
+    SECTION("Intersect") {
+        Segment testSegment(-1, 1, -3, -1);
+        Circle testCircle(0, 0, 2);
+
+        auto intrsct = testSegment.intersect(testCircle);
+        auto intrsctR = testCircle.intersect(testSegment);
+
+        REQUIRE(intrsct.size() == 1);
+        REQUIRE(intrsct[0].x() == Approx(-2));
+        REQUIRE(intrsct[0].y() == Approx(0));
+
+        REQUIRE(intrsctR.size() == 1);
+        REQUIRE(intrsctR[0].x() == Approx(-2));
+        REQUIRE(intrsctR[0].y() == Approx(0));
+    }
+
 }
+
+TEST_CASE("Intersect circles", "[figure][circle]") {
+    SECTION("Circle inside circle") {
+        Circle outerCircle(0, 0, 2.2);
+        Circle innerCircle(0, 0, 1.2);
+
+        auto intrsct = innerCircle.intersect(outerCircle);
+        auto intrsctR = outerCircle.intersect(innerCircle);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Not intersecting") {
+        Circle circleA(0, 0, 2.2);
+        Circle circleB(10, 10, 1.2);
+
+        auto intrsct = circleB.intersect(circleA);
+        auto intrsctR = circleA.intersect(circleB);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Tangent") {
+        Circle circleA(0, 0, 2);
+        Circle circleB(3, 0, 1);
+
+        auto intrsct = circleB.intersect(circleA);
+        auto intrsctR = circleA.intersect(circleB);
+
+        REQUIRE(intrsct.size() == 1);
+        REQUIRE(intrsct[0].x() == Approx(2));
+        REQUIRE(intrsct[0].y() == Approx(0));
+
+        REQUIRE(intrsctR.size() == 1);
+        REQUIRE(intrsctR[0].x() == Approx(2));
+        REQUIRE(intrsctR[0].y() == Approx(0));
+    }
+
+    SECTION("Intersect") {
+        Circle circleA(0, 0, 2);
+        Circle circleB(0, 1, 2.2);
+
+
+        auto intrsct = circleA.intersect(circleB);
+        auto intrsctR = circleB.intersect(circleA);
+
+        REQUIRE(intrsct.size() == 2);
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(-1.99839935, 0.0799935)) != intrsct.end());
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(1.9983993594874, 0.0799999999999)) != intrsct.end());
+
+        REQUIRE(intrsctR.size() == 2);
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(-1.99839935, 0.0799935)) != intrsctR.end());
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(1.99839935, 0.079999999)) != intrsctR.end());
+    }
+
+}
+
+//TEST_CASE("Intersect polyline and segment", "[figure][segment][polyline]") {
+//    SECTION("Very close not intersecting lines") {
+//        std::vector<Point> polyPoints;
+//
+//        polyPoints.emplace_back(6, 4);
+//        polyPoints.emplace_back(0, 1);
+//        polyPoints.emplace_back(5, 1);
+//
+//        Polyline testPolyline(polyPoints);
+//        Segment testSegment(4, 5, 4, -1);
+//
+//        auto intrsct = testPolyline.intersect(testSegment);
+//        auto intrsctR = testSegment.intersect(testPolyline);
+//
+////        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 3)) != intrsct.end());
+////        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 1)) != intrsct.end());
+////
+////        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 3)) != intrsctR.end());
+////        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 1)) != intrsctR.end());
+////
+////        REQUIRE(intrsct.size() == 2);
+////        REQUIRE(intrsctR.size() == 2);
+//    }
+//}

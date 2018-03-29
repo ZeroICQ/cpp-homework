@@ -1,6 +1,10 @@
 #include <cmath>
 #include <vector>
+#include <algorithm>
 #include "figures.h"
+
+//Figure
+//const double Figure::EPS = 0.00001;
 
 //Point
 double Point::distance(const Point &other) const {
@@ -10,12 +14,22 @@ double Point::distance(const Point &other) const {
     );
 }
 
+bool Point::isInBox(const Point &corner1, const Point &corner2) const {
+    double left = fmin(corner1.x(), corner2.x()) - EPS;
+    double top = fmax(corner1.y(), corner2.y()) + EPS;
+
+    double right = fmax(corner1.x(), corner2.x()) + EPS;
+    double bot = fmin(corner1.y(), corner2.y()) - EPS;
+
+    return left < x() && x() < right && bot < y() && y() < top;
+}
+
 double Point::length() const {
     return 0;
 }
 
 bool Point::operator==(const Point &rhs) const {
-    return this->x() == rhs.x() && this->y() == rhs.y();
+    return fabs(this->x() - rhs.x()) < EPS && fabs(this->y() - rhs.y()) < EPS;
 }
 
 //Segment
@@ -28,10 +42,10 @@ std::vector<Point> Segment::intersect(const Segment &other) const {
     double x1, y1, x2, y2, x3, y3, x4, y4, d;
     std::vector<Point> result;
 
-    x1 = start().x();             y1 = start().y();
-    x2 = end().x();                  y2 = end().y();
+    x1 = start().x();       y1 = start().y();
+    x2 = end().x();         y2 = end().y();
     x3 = other.start().x(); y3 = other.start().y();
-    x4 = other.end().x();      y4 = other.end().y();
+    x4 = other.end().x();   y4 = other.end().y();
 
     d = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
 
@@ -49,7 +63,7 @@ std::vector<Point> Segment::intersect(const Segment &other) const {
 
 std::vector<Point> Segment::intersect(const Circle &other) const {
     //http://e-maxx.ru/algo/circle_line_intersection
-    std::vector<Point> result;
+    std::vector<Point> interPoints;
     Point startF(start().x() - other.center().x(), start().y() - other.center().y());
     Point endF(end().x() - other.center().x(), end().y() - other.center().y());
 
@@ -65,7 +79,7 @@ std::vector<Point> Segment::intersect(const Circle &other) const {
     Point intersectionPoint(x0, y0);
 
     if (fabs( C * C - r * r * (A * A + B * B)) < EPS) {
-        result.emplace_back(x0 + other.center().x(),
+        interPoints.emplace_back(x0 + other.center().x(),
                             y0 + other.center().y());
 
     } else if (C * C < r * r * (A * A + B * B) + EPS) {
@@ -77,8 +91,16 @@ std::vector<Point> Segment::intersect(const Circle &other) const {
         double ay = y0 - A * mult + other.center().y();
         double by = y0 + A * mult + other.center().y();
 
-        result.emplace_back(ax, ay);
-        result.emplace_back(bx, by);
+        interPoints.emplace_back(ax, ay);
+        interPoints.emplace_back(bx, by);
+    }
+
+    std::vector<Point> result;
+    //ASK: better way?
+    for(const auto &point : interPoints) {
+        if (point.isInBox(start(), end())) {
+            result.push_back(point);
+        }
     }
 
     return result;
@@ -110,8 +132,8 @@ std::vector<Point> Circle::intersect(const Segment &other) const {
 }
 
 std::vector<Point> Circle::intersect(const Circle &other) const {
-    std::vector<Point> result;
     //http://www.litunovskiy.com/gamedev/intersection_of_two_circles/
+    std::vector<Point> result;
     double distance = center().distance(other.center());
 
     bool nesting = fabs(other.radius() - radius()) > distance;
@@ -135,7 +157,6 @@ std::vector<Point> Circle::intersect(const Circle &other) const {
             result.emplace_back(x3, y3);
             result.emplace_back(x4, y4);
         }
-        return result;
     }
 
     return result;

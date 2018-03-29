@@ -4,6 +4,8 @@
 #include <vector>
 #include <cmath>
 
+#define EPS 0.00001
+
 class Point;
 class Segment;
 class Circle;
@@ -11,7 +13,7 @@ class Polyline;
 
 class Figure {
 public:
-    virtual ~Figure() {}
+    virtual ~Figure() = default;
     virtual double length() const = 0;
 
     virtual std::vector<Point> intersect(const Figure &other) const = 0;
@@ -20,7 +22,7 @@ public:
     virtual std::vector<Point> intersect(const Polyline &other) const = 0;
 
 protected:
-    static constexpr double EPS = 0.00001;
+//    static const double EPS;
 };
 
 
@@ -28,13 +30,14 @@ class Point {
 public:
     Point(double x , double y) :x_(x), y_(y) {}
 
-    bool operator==(const Point& rhs) const;
+    bool operator==(const Point &rhs) const;
 
     double distance(const Point &other) const;
     double length() const;
 
     double x() const { return x_; }
     double y() const { return y_; }
+    bool isInBox(const Point &corner1, const Point &corner2) const;
 
 private:
     double x_, y_;
