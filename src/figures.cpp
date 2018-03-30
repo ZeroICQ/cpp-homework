@@ -228,7 +228,12 @@ std::vector<Point> Polyline::intersect(const Circle &other) const
 
 std::vector<Point> Polyline::intersect(const Polyline &other) const
 {
-    return other.intersect(*this);
+    std::vector<Point> result;
+    for (const auto &segment : segments()) {
+        std::vector<Point> intersect_points = segment.intersect(other);
+        result.insert(result.end(), intersect_points.begin(), intersect_points.end());
+    }
+    return result;
 }
 
 std::vector<Point> Polyline::intersect(const Figure &other) const
