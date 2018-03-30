@@ -392,7 +392,7 @@ TEST_CASE("Intersect polyline and segment", "[figure][polyline][segment")
 
 TEST_CASE("Intersect circle and polyline", "[figure][polyline][circle]")
 {
-    SECTION("Circle inside polygon")
+    SECTION("Circle inside polyline")
     {
         std::vector<Point> polyline_points;
         polyline_points.emplace_back(0, 4);
@@ -440,5 +440,98 @@ TEST_CASE("Intersect circle and polyline", "[figure][polyline][circle]")
         REQUIRE(misc::contains_point(reverse_intersections, Point(3, 0)));
         REQUIRE(misc::contains_point(reverse_intersections, Point(0, 3)));
     }
+
+    SECTION("Polyline inside circle")
+    {
+        std::vector<Point> polyline_points;
+        polyline_points.emplace_back(-9.9, 0);
+        polyline_points.emplace_back(-6, -5);
+        polyline_points.emplace_back(7.5, 6);
+        polyline_points.emplace_back(-4, 9);
+
+        Polyline polyline(polyline_points);
+        Circle circle(0, 0, 10);
+
+        auto intersections = circle.intersect(polyline);
+        auto reverse_intersections = polyline.intersect(circle);
+
+        REQUIRE(intersections.empty());
+        REQUIRE(reverse_intersections.empty());
+    }
+
+    SECTION("No intersection")
+    {
+        std::vector<Point> polyline_points;
+        polyline_points.emplace_back(11, 11);
+        polyline_points.emplace_back(1000, 12);
+        polyline_points.emplace_back(22, 33);
+        polyline_points.emplace_back(45, 111);
+
+        Polyline polyline(polyline_points);
+        Circle circle(0, 0, 10);
+
+        auto intersections = circle.intersect(polyline);
+        auto reverse_intersections = polyline.intersect(circle);
+
+        REQUIRE(intersections.empty());
+        REQUIRE(reverse_intersections.empty());
+    }
 }
 
+TEST_CASE("Intersect polylines", "[figures][polyline]")
+{
+    SECTION("Parallel")
+    {
+        std::vector<Point> polyline_points;
+        polyline_points.emplace_back(0, 10);
+        polyline_points.emplace_back(8, 10);
+        polyline_points.emplace_back(8, 0);
+        polyline_points.emplace_back(10, -2);
+
+        Polyline polyline(polyline_points);
+
+        std::vector<Point> other_polyline_points;
+        other_polyline_points.emplace_back(0, 9);
+        other_polyline_points.emplace_back(7, 9);
+        other_polyline_points.emplace_back(7, 0);
+        other_polyline_points.emplace_back(9, -2);
+
+        Polyline other_polyline(other_polyline_points);
+
+        auto intersections = polyline.intersect(other_polyline);
+        auto reverse_intersections = other_polyline.intersect(polyline);
+
+        REQUIRE(intersections.empty());
+        REQUIRE(reverse_intersections.empty());
+    }
+
+    SECTION("Intersects")
+    {
+        std::vector<Point> polyline_points;
+        polyline_points.emplace_back(0, 10);
+        polyline_points.emplace_back(8, 10);
+        polyline_points.emplace_back(8, 0);
+        polyline_points.emplace_back(10, -2);
+
+        Polyline polyline(polyline_points);
+
+        std::vector<Point> other_polyline_points;
+        other_polyline_points.emplace_back(0, 9);
+        other_polyline_points.emplace_back(10, 9);
+        other_polyline_points.emplace_back(6, 1);
+
+
+        Polyline other_polyline(other_polyline_points);
+
+        auto intersections = polyline.intersect(other_polyline);
+        auto reverse_intersections = other_polyline.intersect(polyline);
+
+        REQUIRE(intersections.size() == 2);
+        REQUIRE(misc::contains_point(intersections, Point(8, 9)));
+        REQUIRE(misc::contains_point(intersections, Point(8, 5)));
+
+        REQUIRE(reverse_intersections.size() == 2);
+        REQUIRE(misc::contains_point(reverse_intersections, Point(8, 9)));
+        REQUIRE(misc::contains_point(reverse_intersections, Point(8, 5)));
+    }
+}
