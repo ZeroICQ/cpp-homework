@@ -535,3 +535,59 @@ TEST_CASE("Intersect polylines", "[figures][polyline]")
         REQUIRE(misc::contains_point(reverse_intersections, Point(8, 5)));
     }
 }
+
+TEST_CASE("Test vector of different figures")
+{
+    std::vector<Figure*> figures;
+    std::vector<Point> intersections;
+    std::vector<Point> reverse_intersections;
+
+    std::vector<Point> polyline_points;
+    polyline_points.emplace_back(-1, 2);
+    polyline_points.emplace_back(2, 2);
+    polyline_points.emplace_back(2, -2);
+
+    Polyline polyline(polyline_points);
+    Segment segment(0, 0, 5, 0);
+    Circle circle(2, 0, 1);
+
+    figures.push_back(&polyline);
+    figures.push_back(&segment);
+    figures.push_back(&circle);
+
+    //polyline-segment
+    intersections = figures[0]->intersect(*figures[1]);
+    reverse_intersections = figures[1]->intersect(*figures[0]);
+
+    REQUIRE(intersections.size() == 1);
+    REQUIRE(intersections[0].x() == 2);
+    REQUIRE(intersections[0].y() == 0);
+
+    REQUIRE(reverse_intersections.size() == 1);
+    REQUIRE(reverse_intersections[0].x() == 2);
+    REQUIRE(reverse_intersections[0].y() == 0);
+
+    //segment-circle
+    intersections = figures[1]->intersect(*figures[2]);
+    reverse_intersections = figures[2]->intersect(*figures[1]);
+
+    REQUIRE(intersections.size() == 2);
+    REQUIRE(misc::contains_point(intersections, Point(1, 0)));
+    REQUIRE(misc::contains_point(intersections, Point(3, 0)));
+
+    REQUIRE(reverse_intersections.size() == 2);
+    REQUIRE(misc::contains_point(reverse_intersections, Point(1, 0)));
+    REQUIRE(misc::contains_point(reverse_intersections, Point(3, 0)));
+
+    //polyline-circle
+    intersections = figures[2]->intersect(*figures[0]);
+    reverse_intersections = figures[0]->intersect(*figures[2]);
+
+    REQUIRE(intersections.size() == 2);
+    REQUIRE(misc::contains_point(intersections, Point(2, 1)));
+    REQUIRE(misc::contains_point(intersections, Point(2, -1)));
+
+    REQUIRE(reverse_intersections.size() == 2);
+    REQUIRE(misc::contains_point(reverse_intersections, Point(2, 1)));
+    REQUIRE(misc::contains_point(reverse_intersections, Point(2, -1)));
+}
