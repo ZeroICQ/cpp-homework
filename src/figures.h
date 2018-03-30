@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdlib>
 #include <utility>
 #include <vector>
@@ -11,22 +12,25 @@ class Segment;
 class Circle;
 class Polyline;
 
-class Figure {
+class Figure
+{
 public:
     virtual ~Figure() = default;
+
     virtual double length() const = 0;
 
     virtual std::vector<Point> intersect(const Figure &other) const = 0;
     virtual std::vector<Point> intersect(const Segment &other) const = 0;
     virtual std::vector<Point> intersect(const Circle &other) const = 0;
     virtual std::vector<Point> intersect(const Polyline &other) const = 0;
-
-protected:
+//
+//protected:
 //    static const double EPS;
 };
 
 
-class Point {
+class Point
+{
 public:
     Point(double x , double y) :x_(x), y_(y) {}
 
@@ -37,7 +41,7 @@ public:
 
     double x() const { return x_; }
     double y() const { return y_; }
-    bool isInBox(const Point &corner1, const Point &corner2) const;
+    bool is_in_box(const Point &corner1, const Point &corner2) const;
 
 private:
     double x_, y_;
@@ -99,6 +103,7 @@ public:
     std::vector<Point> intersect(const Polyline &other) const override;
 
     double length() const override;
+
     const std::vector<Point> &points() const { return points_; }
     std::vector<Segment> segments() const;
 private:

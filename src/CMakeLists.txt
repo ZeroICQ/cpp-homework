@@ -1,7 +1,7 @@
 include_directories(inc)
 
 set(SRC figures.cpp)
-set(TEST_SRC ${SRC} catch.cpp test.cpp)
+set(TEST_SRC ${SRC} catch.cpp test.cpp misc.cpp)
 
 SET(GCC_COVERAGE_COMPILE_FLAGS "-fprofile-arcs -ftest-coverage")
 SET(GCC_COVERAGE_LINK_FLAGS    "-lgcov")
