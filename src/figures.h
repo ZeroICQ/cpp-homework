@@ -99,7 +99,7 @@ public:
     std::vector<Point> intersect(const Polyline &other) const override;
 
     double length() const override;
-    std::vector<Point> points() const { return points_; }
+    const std::vector<Point> &points() const { return points_; }
     std::vector<Segment> segments() const;
 private:
     std::vector<Point> points_;

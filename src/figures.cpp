@@ -198,7 +198,7 @@ std::vector<Segment> Polyline::segments() const {
         result.emplace_back(tmpPoints[i-1], tmpPoints[i]);
     }
 
-    return std::vector<Segment>();
+    return result;
 }
 
 std::vector<Point> Polyline::intersect(const Segment &other) const {

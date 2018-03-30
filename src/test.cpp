@@ -314,27 +314,97 @@ TEST_CASE("Intersect circles", "[figure][circle]") {
 
 }
 
-//TEST_CASE("Intersect polyline and segment", "[figure][segment][polyline]") {
-//    SECTION("Very close not intersecting lines") {
-//        std::vector<Point> polyPoints;
+TEST_CASE("Intersect polyline and segment", "[figure][polyline][segment") {
+    SECTION("Intersect") {
+        Segment testSegment(0, 2, 7, 2);
+        std::vector<Point> polyPoints;
+
+        polyPoints.emplace_back(1, 3);
+        polyPoints.emplace_back(4, 3);
+        polyPoints.emplace_back(4, 1);
+        polyPoints.emplace_back(6, 1);
+        polyPoints.emplace_back(6, 3);
+
+        Polyline testPoly(polyPoints);
+
+        auto intrsct = testSegment.intersect(testPoly);
+        auto intrsctR = testPoly.intersect(testSegment);
+
+        REQUIRE(intrsct.size() == 2);
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 2)) != intrsct.end());
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(6, 2)) != intrsct.end());
+
+        REQUIRE(intrsctR.size() == 2);
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 2)) != intrsctR.end());
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(6, 2)) != intrsctR.end());
+    }
+
+    SECTION("No intersect") {
+        Segment testSegment(5, 5, 5, 2);
+        std::vector<Point> polyPoints;
+
+        polyPoints.emplace_back(1, 3);
+        polyPoints.emplace_back(4, 3);
+        polyPoints.emplace_back(4, 1);
+        polyPoints.emplace_back(6, 1);
+        polyPoints.emplace_back(6, 3);
+
+        Polyline testPoly(polyPoints);
+
+        auto intrsct = testSegment.intersect(testPoly);
+        auto intrsctR = testPoly.intersect(testSegment);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+}
+
+TEST_CASE("Intersect circle and polyline", "[figure][polyline][circle]") {
+    SECTION("Circle inside polygon") {
+        Circle testCircle(0, 0, 2);
+        std::vector<Point> polyPoints;
+        polyPoints.emplace_back(0, 4);
+        polyPoints.emplace_back(7, 1.8);
+        polyPoints.emplace_back(5.6, -4.2);
+        polyPoints.emplace_back(-4, -4);
+        polyPoints.emplace_back(-6, 0);
+        polyPoints.emplace_back(0, 4);
+
+        Polyline testPoly(polyPoints);
+
+        auto intrsct = testCircle.intersect(testPoly);
+        auto intrsctR = testPoly.intersect(testCircle);
+
+        REQUIRE(intrsct.empty());
+        REQUIRE(intrsctR.empty());
+    }
+
+    SECTION("Intersects") {
+        Circle testCircle(0, 0, 3);
+        std::vector<Point> polyPoints;
+        polyPoints.emplace_back(-4, 0);
+        polyPoints.emplace_back(0, 0);
+        polyPoints.emplace_back(0, -1);
+        polyPoints.emplace_back(1, 0);
+        polyPoints.emplace_back(4, 0);
+        polyPoints.emplace_back(4, 4);
+        polyPoints.emplace_back(0, 4);
+        polyPoints.emplace_back(0, 2);
+
+        Polyline testPoly(polyPoints);
 //
-//        polyPoints.emplace_back(6, 4);
-//        polyPoints.emplace_back(0, 1);
-//        polyPoints.emplace_back(5, 1);
-//
-//        Polyline testPolyline(polyPoints);
-//        Segment testSegment(4, 5, 4, -1);
-//
-//        auto intrsct = testPolyline.intersect(testSegment);
-//        auto intrsctR = testSegment.intersect(testPolyline);
-//
-////        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 3)) != intrsct.end());
-////        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(4, 1)) != intrsct.end());
-////
-////        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 3)) != intrsctR.end());
-////        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(4, 1)) != intrsctR.end());
-////
-////        REQUIRE(intrsct.size() == 2);
-////        REQUIRE(intrsctR.size() == 2);
-//    }
-//}
+        auto intrsct = testCircle.intersect(testPoly);
+        auto intrsctR = testPoly.intersect(testCircle);
+
+        REQUIRE(intrsct.size() == 3);
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(-3, 0)) != intrsct.end());
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(3, 0)) != intrsct.end());
+        REQUIRE(std::find(intrsct.begin(), intrsct.end(), Point(0, 3)) != intrsct.end());
+
+        REQUIRE(intrsctR.size() == 3);
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(-3, 0)) != intrsctR.end());
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(3, 0)) != intrsctR.end());
+        REQUIRE(std::find(intrsctR.begin(), intrsctR.end(), Point(0, 3)) != intrsctR.end());
+    }
+}
+
