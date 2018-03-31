@@ -520,7 +520,6 @@ TEST_CASE("Intersect polylines", "[figures][polyline]")
         other_polyline_points.emplace_back(10, 9);
         other_polyline_points.emplace_back(6, 1);
 
-
         Polyline other_polyline(other_polyline_points);
 
         auto intersections = polyline.intersect(other_polyline);
