@@ -11,7 +11,7 @@ ENDIF() # NOT GENHTML_PATH
 
 add_custom_target(coverage
         COMMAND "${CMAKE_BINARY_DIR}/bin/figures_test"
-        COMMAND ${LCOV_PATH} --directory . --capture --output-file ${CMAKE_BINARY_DIR}/coverage.info
+        COMMAND ${LCOV_PATH} --directory "${CMAKE_BINARY_DIR}/src/CMakeFiles/figures_test.dir" --capture --output-file ${CMAKE_BINARY_DIR}/coverage.info
         COMMAND ${GENHTML_PATH} -o ${CMAKE_BINARY_DIR}/coverage/ ${CMAKE_BINARY_DIR}/coverage.info
 
 )
